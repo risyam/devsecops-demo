@@ -1,0 +1,156 @@
+<!-- <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Expense</title>
+</head>
+<body>
+    <h1>Add Expense</h1>
+    <form th:action="@{/add-expense}" th:object="${expense}" method="post">
+        <label for="description">Description</label>
+        <input type="text" id="description" name="description" th:field="*{description}" required>
+
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" name="amount" th:field="*{amount}" required>
+
+        <label for="category">Category</label>
+        <select id="category" name="category" th:field="*{category}" required>
+            <option th:each="category : ${categories}" th:value="${category}" th:text="${category.name}"></option>
+            <option value="Food">Food</option>
+            <option value="Education">Education</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Transport">Transport</option>
+            <option value="Health">Health</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Others">Others</option>
+        </select>
+
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" th:field="*{date}" required>
+
+        <button type="submit">Add Expense</button>
+    </form>
+    <a th:href="@{/}">Back to Home</a>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Add Expense</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            width: 98%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        select,
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        input[type="date"],
+        select {
+            background-color: #f9f9f9;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Add Expense</h1>
+    <form th:action="@{/add-expense}" th:object="${expense}" method="post">
+        <label for="description">Description</label>
+        <input type="text" id="description" name="description" th:field="*{description}" required>
+
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" name="amount" th:field="*{amount}" required>
+
+        <label for="category">Category</label>
+        <select id="category" name="category" th:field="*{category}">
+            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}">Category
+                Name</option>
+        </select>
+        <a href="/add-category">Add New Category</a>
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" th:field="*{date}" required>
+
+        <button type="submit">Add Expense</button>
+    </form>
+    <a th:href="@{/}">Back to Home</a>
+    <script>
+        // JavaScript to set today's date as the default value
+        document.addEventListener("DOMContentLoaded", function () {
+            const dateField = document.getElementById("date");
+            const today = new Date().toISOString().split('T')[0]; // Format date as yyyy-mm-dd
+            dateField.value = today; // Set the value of the date input
+        });
+    </script>
+</body>
+
+</html>

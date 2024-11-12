@@ -1,0 +1,100 @@
+<!-- <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Expense Category</title>
+</head>
+<body>
+    <h1>Add Expense Category</h1>
+    <form th:action="@{/add-category}" th:object="${category}" method="post">
+        <label for="name">Category Name</label>
+        <input type="text" id="name" name="name" th:field="*{name}" placeholder="e.g., Food" required>
+        <button type="submit">Add Category</button>        
+    </form>
+    <a th:href="@{/}">Back to Home</a>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Expense Category</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 98%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input[type="text"] {
+            background-color: #f9f9f9;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #007BFF;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add Expense Category</h1>
+    <form th:action="@{/add-category}" th:object="${category}" method="post">
+        <label for="name">Category Name</label>
+        <input type="text" id="name" name="name" th:field="*{name}" placeholder="e.g., Food" required>
+
+        <button type="submit">Add Category</button>
+    </form>
+    <a th:href="@{/}">Back to Home</a>
+</body>
+</html>
