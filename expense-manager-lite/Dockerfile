@@ -31,5 +31,5 @@ COPY --from=builder /app/target/*.jar /app.jar
 # Set the working directory
 WORKDIR /
 
-# Run the command
+# Execute the command to run the application
 ENTRYPOINT ["java", "-jar", "/app.jar"]
