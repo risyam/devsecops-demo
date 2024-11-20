@@ -8,10 +8,10 @@ WORKDIR /app
 COPY pom.xml .
 
 # Add a non-root user
-#RUN adduser myuser  && chown -R myuser:myuser /app
+RUN adduser myuser  && chown -R myuser:myuser /app
 
 # Switch to non-root user
-#USER myuser
+USER myuser
 
 # Download dependencies
 RUN mvn dependency:resolve
@@ -31,5 +31,5 @@ COPY --from=builder /app/target/*.jar /app.jar
 # Set the working directory
 WORKDIR /
 
-# Run the command
+# Execute the command to run the application
 ENTRYPOINT ["java", "-jar", "/app.jar"]
