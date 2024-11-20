@@ -7,11 +7,11 @@ WORKDIR /app
 # Copy the pom.xml file
 COPY pom.xml .
 
-# # Add a non-root user
-# RUN adduser myuser  && chown -R myuser:myuser /app
+# Add a non-root user
+RUN adduser myuser  && chown -R myuser:myuser /app
 
-# # Switch to non-root user
-# USER myuser
+# Switch to non-root user
+USER myuser
 
 # Download dependencies
 RUN mvn dependency:resolve
