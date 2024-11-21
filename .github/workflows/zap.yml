@@ -22,9 +22,7 @@ jobs:
 
       # Step 2: Build and Start the Application
       - name: Build Docker Image
-        run: |
-          pwd
-          ls ./expense-manager-lite/
+        run: |          
           docker build -t devsecopsdemo ./expense-manager-lite/
       
       - name: Start Application Container
