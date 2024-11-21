@@ -24,8 +24,8 @@ jobs:
       - name: Build Docker Image
         run: |
           pwd
-          ls
-          docker build -t devsecopsdemo /expense-manager-lite/
+          ls ./expense-manager-lite/
+          docker build -t devsecopsdemo ./expense-manager-lite/
       
       - name: Start Application Container
         run: |
