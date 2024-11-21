@@ -1,0 +1,48 @@
+name: OWASP ZAP DAST Scan
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  owasp-zap-scan:
+    name: OWASP ZAP DAST
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Build and Start the Application
+      - name: Build Docker Image
+        run: |
+          docker build -t devsecopsdemo .
+      
+      - name: Start Application Container
+        run: |
+          docker run -d --name expense-app -p 8085:8085 devsecopsdemo
+          
+      # Step 3: Run OWASP ZAP Container
+      - name: Run OWASP ZAP Scan
+        run: |
+          docker run -t --rm \
+          -v $(pwd):/zap/wrk:rw \
+          -u zap \
+          -p 8085:8085 \
+          owasp/zap2docker-stable zap-baseline.py \
+          -t http://localhost:8085 \
+          -r zap_report.html
+
+      # Step 4: Upload ZAP Report
+      - name: Upload OWASP ZAP Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-report
+          path: zap_report.html
