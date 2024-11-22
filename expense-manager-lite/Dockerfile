@@ -20,7 +20,7 @@ RUN mvn clean install
 FROM eclipse-temurin:21
 
 # Add a non-root user
-RUN adduser myuser
+RUN useradd -m myuser
 
 # Switch to non-root user
 USER myuser
