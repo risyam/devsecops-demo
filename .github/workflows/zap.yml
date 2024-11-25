@@ -32,18 +32,22 @@ jobs:
       # Step 3: Run OWASP ZAP Container
       - name: Run OWASP ZAP Scan
         run: |
+          mkdir -p /tmp/zap_workdir \
+          chmod 777 /tmp/zap_workdir \
           docker run -t --rm \
-          -v $(pwd):/zap/wrk:rw \
+          -v /tmp/zap_workdir:/zap/wrk:rw \
           -u zap \
           -p 9091:8085 \
           zaproxy/zap-stable zap-baseline.py \
           -t http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1):8085 \
-          -r zap_report.html \
-          touch /zap/wrk/test.txt
+          -r /tmp/zap_workdir/zap_report.html \
+          
 
       # Step 4: Upload ZAP Report
       - name: Upload OWASP ZAP Report
         uses: actions/upload-artifact@v3
         with:
           name: zap-report
-          path: zap_report.html
+          path: /tmp/zap_workdir/zap_report.html
+          run: |
+            chmod 700 /tmp/zap_workdir
