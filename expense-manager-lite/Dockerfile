@@ -7,12 +7,6 @@ WORKDIR /app
 # Copy the pom.xml file
 COPY pom.xml .
 
-# Add a non-root user
-RUN adduser myuser  && chown -R myuser:myuser /app
-
-# Switch to non-root user
-USER myuser
-
 # Download dependencies
 RUN mvn dependency:resolve
 
@@ -24,6 +18,12 @@ RUN mvn clean install
 
 # Use a smaller JRE-based image for running
 FROM eclipse-temurin:21
+
+# Add a non-root user
+RUN useradd -m myuser
+
+# Switch to non-root user
+USER myuser
 
 # Copy the JAR file from the builder stage
 COPY --from=builder /app/target/*.jar /app.jar

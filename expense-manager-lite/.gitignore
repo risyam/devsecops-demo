@@ -40,5 +40,6 @@ buildNumber.properties
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-
+# sample expense records in the db for testing purpose
+./src/main/resources/import.sql
 
