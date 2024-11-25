@@ -32,8 +32,8 @@ jobs:
       # Step 3: Run OWASP ZAP Container
       - name: Run OWASP ZAP Scan
         run: |
-          mkdir -p /tmp/zap_workdir \
-          chmod 777 /tmp/zap_workdir \
+          mkdir -p /tmp/zap_workdir
+          chmod 777 /tmp/zap_workdir
           docker run -t --rm \
           -v /tmp/zap_workdir:/zap/wrk:rw \
           -u zap \
