@@ -14,6 +14,12 @@ jobs:
   scan:
     name: gitleaks
     runs-on: ubuntu-latest
+    permissions:
+       # Allow access to commit list
+       contents: read
+       # Allow access to adding comments
+       discussions: write
+       pull-requests: write
     steps:
       - uses: actions/checkout@v3
         with:
