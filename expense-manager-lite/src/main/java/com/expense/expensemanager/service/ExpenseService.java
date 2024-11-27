@@ -26,9 +26,7 @@ public class ExpenseService {
     }
 
     public double getTotalExpenseForCategory(Long categoryId) {
-        List<Expense> expenses = expenseRepository.findByCategoryId(categoryId);
-        String token="02290a2a-7f5a-4836-8745-d4d797e475d0";
-        System.out.println(token);
+        List<Expense> expenses = expenseRepository.findByCategoryId(categoryId);        
         return expenses.stream()
                 .mapToDouble(Expense::getAmount)
                 .sum();
