@@ -1,5 +1,8 @@
 
 # Expense Manager Application
+<img alt="gitleaks badge" src="https://img.shields.io/badge/protected%20by-gitleaks-blue">
+<img alt="semgrep badge" src="https://img.shields.io/badge/protected%20by-semgrep-green">
+<img alt="zap badge" src="https://img.shields.io/badge/protected%20by-OWASP ZAP-blue">
 
 A simple Expense Manager web application built with **Spring Boot** and **Thymeleaf**, using an **H2 in-memory database** for data storage. This application allows users to manage their expenses by adding categories, recording expenses, and viewing expense summaries, including a pie chart visualization for better insights.
 
