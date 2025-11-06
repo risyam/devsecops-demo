@@ -1,0 +1,163 @@
+rules:
+  # RULE 1: Detect Exposed H2 Console in Production
+  - id: h2-console-enabled-production
+    patterns:
+      - pattern-regex: "spring\\.h2\\.console\\.enabled\\s*=\\s*true"
+    message: |
+      H2 console is enabled. This should be disabled in production as it allows
+      direct database access without authentication. Set to false or use environment
+      variables: spring.h2.console.enabled=${H2_CONSOLE_ENABLED:false}
+    severity: ERROR
+    languages: [generic]
+    paths:
+      include:
+        - "*.properties"
+    metadata:
+      category: security
+      cwe: "CWE-489: Active Debug Code"
+      owasp: "A05:2021 - Security Misconfiguration"
+      confidence: HIGH
+      likelihood: HIGH
+      impact: HIGH
+
+  # RULE 2: Detect Insecure Cookie Configuration
+  - id: insecure-session-cookie
+    patterns:
+      - pattern-regex: "server\\.servlet\\.session\\.cookie\\.secure\\s*=\\s*false"
+    message: |
+      Session cookies are not secure. This allows cookies to be transmitted over
+      unencrypted HTTP connections, making them vulnerable to interception.
+      Set to 'true' in production: server.servlet.session.cookie.secure=true
+    severity: WARNING
+    languages: [generic]
+    paths:
+      include:
+        - "application*.properties"
+    metadata:
+      category: security
+      cwe: "CWE-614: Sensitive Cookie in HTTPS Session Without 'Secure' Attribute"
+      owasp: "A05:2021 - Security Misconfiguration"
+      confidence: HIGH
+      likelihood: MEDIUM
+      impact: HIGH
+
+  # RULE 3: Detect Missing Authorization Checks (IDOR vulnerability)
+  - id: missing-authorization-check-before-sensitive-operation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              @PostMapping(...)
+              public $RET $METHOD(..., @PathVariable UUID $ID, ...) {
+                ...
+                $SERVICE.delete$ENTITY($ID, ...);
+                ...
+              }
+          - pattern: |
+              @GetMapping(...)
+              public $RET $METHOD(..., @PathVariable UUID $ID, ...) {
+                ...
+                $OBJ = $SERVICE.get$ENTITY($ID);
+                ...
+                return ...;
+              }
+      - pattern-not-inside: |
+          ...
+          if (!$VAR.getUser().getId().equals($CURRENTUSER.getId())) {
+            ...
+          }
+          ...
+      - pattern-not-inside: |
+          ...
+          if ($VAR.getUser().getId().equals($CURRENTUSER.getId())) {
+            ...
+          } else {
+            ...
+          }
+          ...
+    message: |
+      Potential IDOR (Insecure Direct Object Reference) vulnerability detected.
+      Sensitive operation on resource without checking user ownership.
+      Always verify that the current user owns the resource before performing
+      delete/update operations. Add authorization check before $SERVICE call.
+    severity: ERROR
+    languages: [java]
+    paths:
+      include:
+        - "**/src/main/java/**/controller/"
+    metadata:
+      category: security
+      cwe: "CWE-639: Authorization Bypass Through User-Controlled Key"
+      owasp: "A01:2021 - Broken Access Control"
+      confidence: MEDIUM
+      likelihood: HIGH
+      impact: CRITICAL
+
+  # RULE 4: Detect Missing CSRF Token in Thymeleaf Forms
+  - id: thymeleaf-form-missing-csrf-token
+    patterns:
+      - pattern-regex: "<form[^>]*method\\s*=\\s*[\"']post[\"'][^>]*>(?:(?!</form>).)*?</form>"
+      - pattern-not-regex: '(th:action|_csrf\.parameterName)'
+    message: |
+      POST form without CSRF protection detected. 
+      
+      Thymeleaf forms should either:
+      1. Use th:action (automatically includes CSRF): <form th:action="@{/path}" method="post">
+      2. Manually include CSRF token: <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      
+      Note: CSRF is required for ALL state-changing operations including logout!
+      
+      Why logout needs CSRF:
+      - Prevents logout CSRF attacks
+      - Stops session fixation attacks
+      - Protects against forced logouts leading to phishing
+    severity: ERROR
+    languages: [generic]
+    paths:
+      include:
+        - "**/*.html"
+      exclude:
+        - "**/test/**"
+    metadata:
+      category: security
+      cwe: "CWE-352: Cross-Site Request Forgery (CSRF)"
+      owasp: "A01:2021 - Broken Access Control"
+      confidence: MEDIUM
+      likelihood: HIGH
+      impact: HIGH
+      references:
+        - "https://owasp.org/www-community/attacks/csrf"
+        - "https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html"
+
+  # RULE 5: Detect Logging of Sensitive User Data
+  - id: logging-pii-without-masking
+    patterns:
+      - pattern-either:
+          - pattern: logger.$LEVEL("...", ..., $USER.getEmail(), ...)
+          - pattern: logger.$LEVEL("...", ..., $USER.getGoogleId(), ...)
+          - pattern: logger.$LEVEL("...", ..., $USER.getPictureUrl(), ...)
+          - pattern: logger.$LEVEL($MSG, $USER.getEmail(), ...)
+          - pattern: logger.$LEVEL($MSG, $USER.getGoogleId(), ...)
+      - pattern-not-inside: |
+          logger.$LEVEL("...", mask$FUNC($USER.$METHOD()), ...)
+      - pattern-not-inside: |
+          logger.$LEVEL("...", "***", ...)
+    message: |
+      Logging PII (Personally Identifiable Information) without masking.
+      Sensitive user data (email, googleId, pictureUrl) should not be logged in plain text.
+      Use user.getId() instead, or implement masking before logging.
+      Example: logger.info("User action - ID: {}", user.getId());
+    severity: WARNING
+    languages: [java]
+    paths:
+      include:
+        - "**/src/main/java/"
+    metadata:
+      category: security
+      cwe: "CWE-532: Insertion of Sensitive Information into Log File"
+      owasp: "A09:2021 - Security Logging and Monitoring Failures"
+      confidence: HIGH
+      likelihood: MEDIUM
+      impact: MEDIUM
+      references:
+        - "https://owasp.org/www-community/vulnerabilities/Logging_of_Sensitive_Data"
+

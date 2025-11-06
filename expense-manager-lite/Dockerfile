@@ -13,8 +13,8 @@ RUN mvn dependency:resolve
 # Copy the project source code
 COPY . .
 
-# Build the project
-RUN mvn clean install
+# Build the project (skip tests as they require OAuth2 credentials)
+RUN mvn clean install -DskipTests
 
 # Use a smaller JRE-based image for running
 FROM eclipse-temurin:21

@@ -1,2 +1,10 @@
-com/expense/expense_manager/ExpenseManagerApplication.class
-com/expense/expense_manager/ExpenseController.class
+com/expense/expensemanager/model/Expense.class
+com/expense/expensemanager/controller/ExpenseCategoryController.class
+com/expense/expensemanager/controller/ExpenseUIController.class
+com/expense/expensemanager/repository/ExpenseCategoryRepository.class
+com/expense/expensemanager/controller/ExpenseController.class
+com/expense/expensemanager/service/ExpenseCategoryService.class
+com/expense/expensemanager/model/ExpenseCategory.class
+com/expense/expensemanager/repository/ExpenseRepository.class
+com/expense/expensemanager/ExpenseManagerApplication.class
+com/expense/expensemanager/service/ExpenseService.class

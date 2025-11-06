@@ -43,3 +43,15 @@ buildNumber.properties
 # sample expense records in the db for testing purpose
 ./src/main/resources/import.sql
 
+# Local configuration with sensitive credentials (NEVER commit!)
+**/application-local.properties
+application-local.properties
+
+# macOS files
+.DS_Store
+**/.DS_Store
+
+# IDE files
+.idea/
+*.iml
+.vscode/
