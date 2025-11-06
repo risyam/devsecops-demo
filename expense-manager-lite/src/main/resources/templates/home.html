@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Manager Application</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+        }
+
+        .user-name {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.3s;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .logout-btn:hover {
+            background: #5568d3;
+        }
+
+        /* Welcome Section with Stats */
+        .welcome-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .welcome-content {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .welcome-content h2 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .welcome-content p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .welcome-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .mini-stat {
+            background: #f8f9ff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .mini-stat-label {
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .mini-stat-value {
+            color: #333;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* Total Expenses Card */
+        .total-expenses-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .total-expenses-card h3 {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .total-expenses-card .value {
+            color: white;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .total-expenses-card .label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .welcome-stats {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header h2 {
+            color: #333;
+            font-size: 22px;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 0;
+        }
+
+        .action-btn {
+            background: white;
+            color: #333;
+            padding: 25px 30px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+            border-bottom: 1px solid #f0f0f0;
+            border-right: 1px solid #f0f0f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateX(5px);
+            z-index: 1;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn .icon {
+            font-size: 24px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover .icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .action-btn:last-child {
+            border-radius: 0 0 15px 0;
+        }
+
+        .action-btn:nth-last-child(2) {
+            border-radius: 0 0 0 15px;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-btn:last-child {
+                border-radius: 0 0 15px 15px;
+            }
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Chart Section */
+        .chart-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .chart-section .section-header {
+            box-shadow: none;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .chart-content {
+            padding: 30px;
+        }
+
+        #expenseChart {
+            max-width: 100%;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 16px;
+        }
+
+        /* Recent Expenses */
+        .recent-expenses {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .recent-expenses .section-header {
+            box-shadow: none;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .expense-list-container {
+            padding: 20px;
+        }
+
+        .expense-list {
+            list-style: none;
+        }
+
+        .expense-item {
+            padding: 18px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .expense-item:hover {
+            background: #f8f9ff;
+            padding-left: 25px;
+        }
+
+        .expense-item:last-child {
+            border-bottom: none;
+        }
+
+        .expense-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .expense-item:hover::before {
+            opacity: 1;
+        }
+
+        .expense-info {
+            flex: 1;
+        }
+
+        .expense-description {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        .expense-meta {
+            color: #999;
+            font-size: 13px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .expense-category {
+            background: #f8f9ff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .expense-amount {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .view-all-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .view-all-link:hover {
+            color: #5568d3;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💰 Expense Manager</h1>
+            <div class="user-info">
+                <img th:if="${currentUser.pictureUrl}" 
+                     th:src="${currentUser.pictureUrl}" 
+                     alt="Profile" 
+                     class="user-avatar"
+                     onerror="this.style.display='none'">
+                <span class="user-name" th:text="${currentUser.name}">User Name</span>
+                <form method="post" action="/logout" style="display: inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div th:if="${message}" class="alert alert-success">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Welcome Section with Total Expenses -->
+        <div class="welcome-section">
+            <div class="welcome-content">
+                <h2>Welcome back, <span th:text="${currentUser.name}">User</span>! 👋</h2>
+                <p>Here's an overview of your expense tracking</p>
+                <div class="welcome-stats">
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Transactions</div>
+                        <div class="mini-stat-value" th:text="${expenseCount}">0</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Categories</div>
+                        <div class="mini-stat-value" th:text="${categoryCount}">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="total-expenses-card">
+                <h3>Total Expenses</h3>
+                <div class="value">₹<span th:text="${#numbers.formatDecimal(totalExpenses, 1, 2)}">0.00</span></div>
+                <div class="label">All time spending</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="section-header">
+                <h2>Quick Actions</h2>
+            </div>
+            <div class="action-buttons">
+                <a href="/add-expense" class="action-btn">
+                    <span class="icon">➕</span>
+                    <span>Add Expense</span>
+                </a>
+                <a href="/add-category" class="action-btn">
+                    <span class="icon">📁</span>
+                    <span>Add Category</span>
+                </a>
+                <a href="/expenses" class="action-btn">
+                    <span class="icon">📊</span>
+                    <span>View All Expenses</span>
+                </a>
+                <a href="/categories" class="action-btn">
+                    <span class="icon">🏷️</span>
+                    <span>View Categories</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2>Expenses by Category</h2>
+                </div>
+                <div class="chart-content">
+                    <canvas id="expenseChart"></canvas>
+                    <div id="noDataMessage" class="no-data" style="display: none;">
+                        No expense data available. Start by adding your first expense!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Expenses -->
+            <div class="recent-expenses">
+                <div class="section-header">
+                    <h2>Recent Expenses</h2>
+                </div>
+                <div class="expense-list-container">
+                    <ul class="expense-list" th:if="${!#lists.isEmpty(recentExpenses)}">
+                        <li class="expense-item" th:each="expense : ${recentExpenses}">
+                            <div class="expense-info">
+                                <div class="expense-description" th:text="${expense.description}">Description</div>
+                                <div class="expense-meta">
+                                    <span class="expense-category" th:text="${expense.category.name}">Category</span>
+                                    <span th:text="${#temporals.format(expense.date, 'MMM dd, yyyy')}">Date</span>
+                                </div>
+                            </div>
+                            <div class="expense-amount">₹<span th:text="${#numbers.formatDecimal(expense.amount, 1, 2)}">0.00</span></div>
+                        </li>
+                    </ul>
+                    <div th:if="${#lists.isEmpty(recentExpenses)}" class="no-data">
+                        No expenses yet. Add your first expense to get started!
+                    </div>
+                </div>
+                <a href="/expenses" class="view-all-link" th:if="${!#lists.isEmpty(recentExpenses)}">View All Expenses →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script th:inline="javascript">
+        // Fetch expense data and render chart
+        fetch('/expense-data')
+            .then(response => response.json())
+            .then(data => {
+                if (Object.keys(data).length === 0) {
+                    document.getElementById('expenseChart').style.display = 'none';
+                    document.getElementById('noDataMessage').style.display = 'block';
+                    return;
+                }
+
+                const ctx = document.getElementById('expenseChart').getContext('2d');
+                const labels = Object.keys(data);
+                const values = Object.values(data);
+
+                // Generate beautiful gradient colors
+                const colors = [
+                    '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                    '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+                    '#fa709a', '#fee140', '#30cfd0', '#330867'
+                ];
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: colors.slice(0, labels.length),
+                            borderWidth: 3,
+                            borderColor: '#fff',
+                            hoverOffset: 15
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: {
+                                        size: 12,
+                                        family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                                    },
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.parsed.toFixed(1) + '%';
+                                    }
+                                },
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 8,
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 13
+                                }
+                            }
+                        },
+                        animation: {
+                            animateRotate: true,
+                            animateScale: true
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching expense data:', error);
+                document.getElementById('expenseChart').style.display = 'none';
+                document.getElementById('noDataMessage').style.display = 'block';
+            });
+    </script>
+</body>
+</html>
+
+

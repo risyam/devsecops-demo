@@ -1,0 +1,12 @@
+# Local Configuration Template
+# Copy this file to application-local.properties and add your actual credentials
+# application-local.properties is gitignored for security
+
+# Google OAuth2 Configuration
+# Get these from: https://console.cloud.google.com/apis/credentials
+spring.security.oauth2.client.registration.google.client-id=YOUR_GOOGLE_CLIENT_ID_HERE
+spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIENT_SECRET_HERE
+
+# Optional: Enable H2 console for development (NEVER in production!)
+# spring.h2.console.enabled=true
+
