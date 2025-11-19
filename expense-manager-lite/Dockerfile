@@ -1,35 +1,40 @@
-# Use a Maven-based image for building
-FROM maven:3.9-eclipse-temurin-23 as builder
-
-# Set the working directory
+# ---- build stage ----
+FROM maven:3.9-eclipse-temurin-23 AS builder
 WORKDIR /app
 
-# Copy the pom.xml file
-COPY pom.xml .
+# copy pom first to leverage Docker layer cache for dependencies
+COPY pom.xml ./
 
-# Download dependencies
-RUN mvn dependency:resolve
+# resolve dependencies (go-offline helps, but see notes)
+RUN mvn -B -f pom.xml dependency:go-offline
 
-# Copy the project source code
+# copy the rest of the project (use .dockerignore to exclude target/)
 COPY . .
 
-# Build the project (skip tests as they require OAuth2 credentials)
-RUN mvn clean install -DskipTests
+# defensive: ensure no stale build artifacts
+RUN rm -rf /app/target || true
 
-# Use a smaller JRE-based image for running
-FROM eclipse-temurin:21
+# build artifact (skip tests if OAuth2 creds are not available)
+RUN mvn -B clean package -DskipTests
 
-# Add a non-root user
-RUN useradd -m myuser
+# Find and copy the executable JAR (exclude .original files)
+RUN find /app/target -name "*.jar" ! -name "*.original" -exec cp {} /app/app.jar \;
+
+# ---------- runtime ----------
+FROM eclipse-temurin:21-jre
+
+# create a non-root user (using UID 1001 to avoid conflicts with base image)
+RUN useradd -m -u 1001 myuser
+
+WORKDIR /app
+
+# Copy the built jar from builder stage
+COPY --from=builder --chown=myuser:myuser /app/app.jar /app/app.jar
 
 # Switch to non-root user
 USER myuser
 
-# Copy the JAR file from the builder stage
-COPY --from=builder /app/target/*.jar /app.jar
+# Expose the port your app listens on
+EXPOSE 8085
 
-# Set the working directory
-WORKDIR /
-
-# Execute the command to run the application
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
