@@ -45,10 +45,11 @@ jobs:
           
 
       # Step 4: Upload ZAP Report
+      - name: Set report permissions
+        run: chmod 700 /tmp/zap_workdir
+
       - name: Upload OWASP ZAP Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: zap-report
           path: /tmp/zap_workdir/zap_report.html
-          run: |
-            chmod 700 /tmp/zap_workdir
