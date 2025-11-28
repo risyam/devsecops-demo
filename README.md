@@ -1,4 +1,4 @@
-# 🛡️ DevSecOps Demo - Expense Manager Application
+. # 🛡️ DevSecOps Demo - Expense Manager Application
 
 <p align="left">
   <img alt="gitleaks badge" src="https://img.shields.io/badge/protected%20by-gitleaks-blue">
@@ -12,21 +12,30 @@ A **DevSecOps demonstration project** showcasing secure CI/CD practices with aut
 
 ---
 
-## 📋 Table of Contents
+## TL;DR
+
+This project is a security-focused DevSecOps demonstration showcasing how to secure a modern Spring Boot application using:
+
+- Semgrep SAST with custom rules
+- Gitleaks secret scanning
+- Secure CI/CD workflows (GitHub Actions)
+- Spring Security + Google OAuth2
+- Secure coding practices (CSRF, UUID IDs, log masking)
+- OWASP ZAP DAST
+
+## Table of Contents
 
 - [What is This Project?](#what-is-this-project)
-- [Why This Was Created](#why-this-was-created)
 - [Security Tools Integration](#security-tools-integration)
-- [Features](#features)
+- [Security Features](#security-features)
 - [Technologies Used](#technologies-used)
 - [Local Development Setup](#local-development-setup)
-- [Testing the Application](#testing-the-application)
 - [Viewing Security Findings in GitHub PR](#viewing-security-findings-in-github-pr)
 - [Architecture](#architecture)
 
 ---
 
-## 🎯 What is This Project?
+## What is This Project?
 
 This is an **Expense Manager** web application that serves as a **DevSecOps demonstration** showcasing:
 
@@ -74,22 +83,37 @@ This project demonstrates how to:
 
 ---
 
-## 🔒 Security Tools Integration
+## Quickstart
+
+1. Clone:
+   ```bash
+   git clone https://github.com/your-username/devsecops-demo.git
+   cd devsecops-demo/expense-manager-lite
+   ```
+
+2. Build docker image:
+
+    ```bash
+   docker build -t expense-manager .
+   ```
+
+3. Run (use your Google OAuth creds):
+
+   ```bash
+      docker run -p 8085:8085 \
+      -e GOOGLE_CLIENT_ID="..." \
+      -e GOOGLE_CLIENT_SECRET="..." \
+      expense-manager
+   ```
+
+4. Open http://localhost:8085
+
+## Security Tools Integration
 
 ### **1. Semgrep (SAST)**
 
-**What it does:** Static Application Security Testing - scans code for vulnerabilities
-
-**Integration:**
-- Custom rules in `semgrep-custom-rules.yaml`
-- Runs on every PR and push to main
-- Detects: H2 console exposure, insecure cookies, CSRF issues, PII logging, authorization bypass
-
-**Configuration:**
-```yaml
-# .github/workflows/semgrep.yml
-- run: semgrep --config semgrep-custom-rules.yaml
-```
+**Purpose**: Static analysis for Spring Boot security issues <br>
+**Runs on**: Every PR + push to main
 
 **Custom Rules:**
 1. ✅ H2 Console Exposure Detection
@@ -100,43 +124,27 @@ This project demonstrates how to:
 
 ### **2. Gitleaks (Secret Detection)**
 
-**What it does:** Scans for hardcoded secrets, API keys, passwords
+**Purpose**: Detects leaked secrets in commits  
+**Runs** on: Every PR
 
 **Integration:**
 - Runs on every PR
 - Checks all commits for leaked credentials
 - Prevents accidental secret exposure
 
-**Configuration:**
-```yaml
-# .github/workflows/gitleaks.yml (to be added)
-- uses: gitleaks/gitleaks-action@v2
-```
-
 ### **3. OWASP ZAP (DAST) - Planned**
 
-**What it does:** Dynamic Application Security Testing - tests running application
+**Purpose:** Automated dynamic security testing against the running app
 
-**Integration (Planned):**
-- Automated penetration testing
-- API endpoint security testing
-- Authentication bypass testing
-
----
-
-## Security Features
-
-- ✅ **UUID Primary Keys** - Prevents enumeration attacks
-- ✅ **CSRF Protection** - All POST requests protected
-- ✅ **Input Validation** - Bean validation on all inputs
-- ✅ **Secure Sessions** - HTTP-only, secure cookies (production)
-- ✅ **Log Masking** - PII automatically masked in logs
-- ✅ **No SQL Injection** - JPA/Hibernate prepared statements
-- ✅ **Authorization Checks** - Service-layer ownership validation
+**Roadmap:**
+- Baseline scans
+- Authenticated scans
+- API scanning
+- Active scan profile for high-risk endpoints
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 ### Backend
 - **Java 21** - Modern Java features
@@ -162,7 +170,7 @@ This project demonstrates how to:
 
 ---
 
-## 💻 Local Development Setup
+## Local Development Setup
 
 ### Prerequisites
 
@@ -223,99 +231,7 @@ docker run -p 8085:8085 \
 3. Authorize the application
 4. Start managing expenses!
 
-## 🔍 Viewing Security Findings in GitHub PR
-
-### Automated Security Checks
-
-When you create a Pull Request, automated security scans run:
-
-### **1. Semgrep SAST Scan**
-
-**Location:** PR Checks → "semgrep/ci" workflow
-
-**What you'll see:**
-```
-✅ semgrep/ci - No vulnerabilities found
-❌ semgrep/ci - 3 vulnerabilities found
-```
-
-**View Details:**
-1. Click on **"Details"** next to semgrep check
-2. See list of findings with:
-   - Severity (ERROR, WARNING)
-   - File location and line number
-   - Vulnerability description
-   - Fix recommendations
-
-**Example Finding:**
-```
-❌ ERROR: h2-console-enabled-production
-   File: application.properties:9
-   
-   H2 console is enabled. This should be disabled in production.
-   
-   Fix: spring.h2.console.enabled=false
-```
-
-### **2. View in GitHub Security Tab**
-
-**Steps:**
-1. Go to repository → **Security** tab
-2. Click **Code scanning alerts**
-3. Filter by:
-   - Severity (Critical, High, Medium, Low)
-   - Tool (Semgrep)
-   - Status (Open, Fixed)
-
-### **3. PR Comments**
-
-Semgrep automatically comments on PR with findings:
-
-```markdown
-### 🔒 Semgrep Security Findings
-
-**❌ 2 errors found**
-
-#### insecure-session-cookie (line 40)
-Session cookies are not secure. Set to 'true' in production.
-
-#### h2-console-enabled-production (line 9)
-H2 console exposed. Disable in production.
-```
-
-### **4. Block Merge on Failure**
-
-Configure branch protection:
-
-**Settings → Branches → Branch protection rules**
-- ✅ Require status checks to pass
-- ✅ Select: `semgrep/ci`
-- ✅ Require branches to be up to date
-
-Now PRs with security issues **cannot be merged** until fixed!
-
-### **5. Fix Workflow**
-
-```bash
-# 1. Developer creates PR
-git checkout -b fix-security-issue
-git push origin fix-security-issue
-
-# 2. Semgrep finds issue
-# GitHub shows: ❌ semgrep/ci failed
-
-# 3. Developer fixes issue
-# Edit file, commit, push
-
-# 4. Semgrep re-runs automatically
-# GitHub shows: ✅ semgrep/ci passed
-
-# 5. PR can now be merged
-```
-
----
-
-## 📊 Architecture
+## Architecture
 
 ### Application Architecture
 
@@ -400,7 +316,7 @@ git push origin fix-security-issue
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 devsecops-demo/
@@ -432,31 +348,7 @@ devsecops-demo/
 
 ---
 
-## 🎯 Custom Semgrep Rules
-
-### Rule 1: H2 Console Exposure
-Detects H2 console enabled in production
-
-### Rule 2: Insecure Session Cookies
-Finds cookies without secure flag
-
-### Rule 3: Missing Authorization Checks
-Detects IDOR vulnerabilities
-
-### Rule 4: Missing CSRF Tokens
-Finds forms without CSRF protection
-
-### Rule 5: PII Logging
-Detects logging of sensitive user data
-
-**Run Rules:**
-```bash
-semgrep --config semgrep-custom-rules.yaml expense-manager-lite/
-```
-
----
-
-## 📚 Additional Resources
+## Additional Resources
 
 - [Semgrep Rules Documentation](https://semgrep.dev/docs/)
 - [OWASP Top 10 2021](https://owasp.org/Top10/)
@@ -465,7 +357,7 @@ semgrep --config semgrep-custom-rules.yaml expense-manager-lite/
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please:
 1. Fork the repository
@@ -475,22 +367,9 @@ Contributions are welcome! Please:
 
 ---
 
-## 📝 License
+## License
 
 This project is for educational and demonstration purposes.
-
----
-
-## 🎓 Learning Outcomes
-
-After exploring this project, you'll understand:
-
-✅ How to integrate SAST into CI/CD
-✅ How to write custom Semgrep rules
-✅ How to implement secure coding practices
-✅ How to prevent common vulnerabilities (OWASP Top 10)
-✅ How to implement DevSecOps workflows
-✅ How to use Spring Security effectively
 
 ---
 
