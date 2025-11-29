@@ -237,7 +237,7 @@ Detailed diagrams and explanations live in [`expense-manager-lite/docs/architect
 
 ## Semgrep Custom Rules
 
-The complete catalog of custom checks (IDOR, insecure cookies, CSRF, PII logging, etc.) is maintained in [`expense-manager-lite/docs/semgrep-rules/semgrep-custom-rules.md`](expense-manager-lite/docs/semgrep-rules/semgrep-custom-rules.md), including rationale, Semgrep patterns, and remediation guidance.
+The complete catalog of custom checks (IDOR, insecure cookies, CSRF, PII logging, etc.) is maintained in [`expense-manager-lite/docs/semgrep-rules`](expense-manager-lite/docs/semgrep-rules), including rationale, Semgrep patterns, and remediation guidance.
 
 
 ## Additional Resources
