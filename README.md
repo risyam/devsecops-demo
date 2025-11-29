@@ -1,4 +1,4 @@
-. # 🛡️ DevSecOps Demo - Expense Manager Application
+# 🛡️ DevSecOps Demo - Expense Manager Application
 
 <p align="left">
   <img alt="gitleaks badge" src="https://img.shields.io/badge/protected%20by-gitleaks-blue">
@@ -233,120 +233,12 @@ docker run -p 8085:8085 \
 
 ## Architecture
 
-### Application Architecture
+Detailed diagrams and explanations live in [`expense-manager-lite/docs/architecture.md`](expense-manager-lite/docs/architecture.md). This doc covers the browser → Spring Boot → H2 data flow, the local Docker runtime, and how GitHub Actions + security scanners fit into the system.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Browser                             │
-│              (Thymeleaf + Chart.js)                     │
-└────────────────────┬────────────────────────────────────┘
-                     │ HTTPS + OAuth2
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│              Spring Security                            │
-│  ✓ OAuth2 Login (Google)                              │
-│  ✓ CSRF Protection                                     │
-│  ✓ Session Management                                  │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│            Controllers Layer                            │
-│  • ExpenseUIController (Web)                           │
-│  • ExpenseController (REST API)                        │
-│  • ExpenseCategoryController (REST API)                │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│              Services Layer                             │
-│  • ExpenseService                                      │
-│  • ExpenseCategoryService                              │
-│  • UserService                                         │
-│  ✓ Authorization checks                                │
-│  ✓ Business logic                                      │
-│  ✓ Logging with PII masking                           │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│           Repositories Layer                            │
-│  • ExpenseRepository (JPA)                             │
-│  • ExpenseCategoryRepository (JPA)                     │
-│  • UserRepository (JPA)                                │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│              H2 Database                                │
-│  File: ~/expensemanager.mv.db                          │
-└─────────────────────────────────────────────────────────┘
-```
+## Semgrep Custom Rules
 
-### CI/CD Security Pipeline
+The complete catalog of custom checks (IDOR, insecure cookies, CSRF, PII logging, etc.) is maintained in [`expense-manager-lite/docs/semgrep-rules/semgrep-custom-rules.md`](expense-manager-lite/docs/semgrep-rules/semgrep-custom-rules.md), including rationale, Semgrep patterns, and remediation guidance.
 
-```
-┌─────────────┐
-│  Developer  │
-│  git push   │
-└──────┬──────┘
-       │
-       ▼
-┌────────────────────────────────────────┐
-│      GitHub Actions CI/CD              │
-│                                        │
-│  1. Gitleaks Secret Scan               │
-│     ↓                                  │
-│  2. Semgrep SAST                       │
-│     • Custom rules                     │
-│     • 5 security checks                │
-│     ↓                                  │
-│  3. Build & Test                       │
-│     • Maven compile                    │
-│     • Unit tests                       │
-│     ↓                                  │
-│  4. OWASP ZAP DAST (planned)          │
-│     ↓                                  │
-│  5. Dependency Check (planned)         │
-│                                        │
-│  ✅ All passed → Merge allowed         │
-│  ❌ Failed → Block merge               │
-└────────────────────────────────────────┘
-```
-
----
-
-## Project Structure
-
-```
-devsecops-demo/
-├── .github/
-│   └── workflows/
-│       └── semgrep.yml              # Semgrep CI/CD workflow
-├── expense-manager-lite/
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   │   └── com/expense/expensemanager/
-│   │   │   │       ├── controller/  # REST & UI controllers
-│   │   │   │       ├── service/     # Business logic
-│   │   │   │       ├── repository/  # Data access
-│   │   │   │       ├── model/       # Entities (UUID IDs)
-│   │   │   │       ├── security/    # OAuth2 & security config
-│   │   │   │       └── exception/   # Error handling
-│   │   │   └── resources/
-│   │   │       ├── templates/       # Thymeleaf HTML
-│   │   │       ├── application.properties
-│   │   │       ├── logback-spring.xml  # Log masking config
-│   │   │       └── import.sql       # Sample data (UUIDs)
-│   │   └── test/                    # Unit tests
-│   ├── Dockerfile                   # Container config
-│   └── pom.xml                      # Maven dependencies
-├── semgrep-custom-rules.yaml        # Custom SAST rules
-└── README.md                        # This file
-```
-
----
 
 ## Additional Resources
 
